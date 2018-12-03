@@ -2,6 +2,7 @@ import pickle, random, os
 from flask import Flask, render_template, redirect, session, request, make_response
 from flask_session import Session
 
+# Configure routes
 homeaddress = 'http://localhost:5000/'
 initaddress = 'http://localhost:5000/init'
 p1address = 'http://localhost:5000/player1'
@@ -10,15 +11,17 @@ exitaddress = 'http://localhost:5000/exit'
 
 CWD = os.getcwd()
 
-
 app = Flask(__name__)
 
+
+# Display board in console
 def display(board):
     for i in range(3):
         print (board[i][0] + ' | ' + board[i][1] + ' | ' + board[i][2])
         if i<2:
             print ('---------')
 
+# Get move from console input and validate. Return updated list of used moves
 def getmove(used, turn):
     validated = False
     while validated == False:
@@ -30,12 +33,14 @@ def getmove(used, turn):
                 validated = True
     return used
 
+# If new move is not already used, update and return list of used moves
 def addmove(used, move):
     move -= 1
     if move not in used:
         used.append(move)
     return used
 
+# Update board with current move, return board
 def updateboard(board, move, symbol):
     move -= 1
     if move < 3:
@@ -46,6 +51,7 @@ def updateboard(board, move, symbol):
         board[2][move%3] = symbol
     return board
 
+# Check board to see if there is a winner
 def checkforwinner(board):
     winner = 0
     for i in range(3):
@@ -67,6 +73,7 @@ def checkforwinner(board):
         winner = 2
     return winner
 
+# End the game by writing '0' to turnFile
 def endgame():
     try:
         boardFile, usedFile, turnFile = getFileNames()
@@ -76,11 +83,13 @@ def endgame():
         f.write('0')
     return
 
+# Return gameID cookie
 def getcookies():
     cookies = dict()
     cookies['gameID'] = request.cookies.get('gameID')
     return cookies
 
+# Return filenames for a given game based on the assigned cookie value
 def getFileNames():
     cookies = getcookies()
     try:
@@ -91,6 +100,7 @@ def getFileNames():
         return
     return boardFile, usedFile, turnFile
 
+# Initialize specific game's files
 def initgame():
     try:
         boardFile, usedFile, turnFile = getFileNames()
@@ -109,6 +119,7 @@ def initgame():
         f.write('1')
     return
 
+# Return current game state based on assigned cookies
 def getGameState():
     try:
         boardFile, usedFile, turnFile = getFileNames()
@@ -122,6 +133,7 @@ def getGameState():
         turn = f.read()
     return board, used, turn
 
+# Update game state based on assigned cookies
 def updateGameState(board, used, turn):
     try:
         boardFile, usedFile, turnFile = getFileNames()
@@ -135,6 +147,7 @@ def updateGameState(board, used, turn):
         f.write(turn)
     return
 
+# Validate player 1 move and update game if valid
 def p1move(move):
     try:
         board, used, turn = getGameState()
@@ -151,6 +164,7 @@ def p1move(move):
         updateGameState(board, used, '2')
     return
 
+# Validate player 2 move and update if valid
 def p2move(move):
     try:
         board, used, turn = getGameState()
@@ -167,6 +181,7 @@ def p2move(move):
         updateGameState(board, used, '1')
     return
 
+# Delete game files of a specific game based on cookies if they exist
 def deleteData():
     try:
         boardFile, usedFile, turnFile = getFileNames()
@@ -186,6 +201,7 @@ def deleteData():
         pass
     return
 
+# Check if specific game files exist
 def checkFiles():
     try:
         boardFile, usedFile, turnFile = getFileNames()
@@ -196,6 +212,7 @@ def checkFiles():
     else:
         return False
 
+# Count number of existing game files. If over threshold, delete oldest game.
 def deleteExcessFiles():
     files = dict()
     count = 0
@@ -220,12 +237,16 @@ def deleteExcessFiles():
     return
 
 
-#####################################################################
+#####################################
+# Primary routes
+#####################################
 
+# Home HTML
 @app.route("/")
 def home():
     return render_template('home.html')
 
+# Create a game, assigns gameID cookie to client
 @app.route("/creategame")
 def creategame():
     gameID = getcookies()['gameID']
@@ -234,11 +255,11 @@ def creategame():
             gameID = str(random.randint(100000, 999999))
             if not os.path.isfile(CWD + '/gameFiles/' + gameID + 'board.txt'):
                 break
-    #message = 'Game ID: ' + gameID
     resp = make_response(redirect(initaddress))
     resp.set_cookie('gameID', gameID)
     return resp
 
+# Initialize game based on cookies and delete excess files
 @app.route("/init")
 def init():
     gameID = getcookies()['gameID']
@@ -249,10 +270,12 @@ def init():
     deleteExcessFiles()
     return render_template('gameID.html', message=message)
 
+# Join game HTML
 @app.route("/joingame")
 def joingame():
     return render_template('joingame.html')
 
+# Receive gameID post, set cookie and load HTML on success, redirect to join game HTML on failure
 @app.route("/joinpost", methods=["POST"])
 def joinpost():
     if request.method == "POST":
@@ -264,14 +287,7 @@ def joinpost():
             return resp
     return render_template('joingame.html')
 
-'''
-@app.route("/getuser")
-def getuser():
-    #cookie = {'hostID': request.cookies.get('hostID'), 'gameID': request.cookies.get('gameID')}
-    deleteExcessFiles()
-    return 'done'
-'''
-
+# Delete game files, clear gameID cookie
 @app.route("/exit")
 def exit():
     deleteData()
@@ -279,6 +295,7 @@ def exit():
     resp.set_cookie('gameID', '', expires=0)
     return resp
 
+# Player 1 board
 @app.route("/player1")
 def p1():
     if checkFiles() == False:
@@ -305,6 +322,7 @@ def p1():
     gameIDmessage = 'Game ID: ' + getcookies()['gameID']
     return render_template('p1board.html', board=board, message=message, gameID=gameIDmessage)
 
+# Player 2 board
 @app.route("/player2")
 def p2():
     if checkFiles() == False:
@@ -330,6 +348,12 @@ def p2():
 
     gameIDmessage = 'Game ID: ' + getcookies()['gameID']
     return render_template('p2board.html', board=board, message=message, gameID=gameIDmessage)
+
+
+
+#####################################
+# Individual move routes
+#####################################
 
 @app.route("/p1-1")
 def p11():
@@ -420,6 +444,7 @@ def p28():
 def p29():
     p2move(9)
     return redirect(p2address)
+
 
 # Run app at machine's IP and port 5000
 if __name__ == "__main__":
