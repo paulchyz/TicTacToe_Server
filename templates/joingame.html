@@ -1,0 +1,76 @@
+<html>  
+  <head>
+    <title>Tic Tac Toe</title>
+  </head>
+
+  <style>
+    body{
+       text-align: center;
+    }
+    h1{
+       font-family: 'Lucida Console', Monaco;
+       font-weight: normal;
+       color: #2657a5;
+       font-size: 1.8em;
+    }
+    h2{
+      font-family: 'Lucida Console', Monaco;
+      font-weight: normal;
+      color: #2657a5;
+      font-size: 1.2em;
+    }
+    h3{
+      font-family: 'Lucida Console', Monaco;
+      font-weight: normal;
+      color: #2657a5;
+      font-size: 1em;
+    }
+    button{
+      background-color: #fff;
+      width: 130px;
+      height: 40px;
+      margin: 10px;
+      cursor: pointer;
+      color: #2657a5;
+      font-size: 1em;
+    }
+    input[type=text]{
+      font-size: 1em;
+      color: #2657a5;
+      margin: 10px;
+      width: 100px;
+    }
+    input[type=submit]{
+      font-size: 1em;
+      color: #2657a5;
+      width: 65px;
+    }
+    .gameId {
+      font-family: 'Lucida Console', Monaco;
+      float:right;
+      color: #2657a5;
+    }
+    </style>
+
+  <body>
+    <div class="gameId">
+      {{gameID}}
+    </div>
+    <br>
+    <h1> Tic Tac Toe </h1>
+    <h2> Enter your Game ID: </h2>
+
+    <div>
+        <form action="http://localhost:5000/joinpost" method="POST">
+          <input type="text" name="gameID"><br>
+          <input type="submit" value="Submit">
+        </form>
+
+        <button onclick="location.href = 'http://localhost:5000/exit'">Cancel</button>
+    </div>
+
+  </body>
+  
+    
+
+</html>

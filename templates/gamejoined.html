@@ -1,0 +1,73 @@
+<html>  
+  <head>
+    <title>Tic Tac Toe</title>
+  </head>
+
+  <style>
+    body{
+       text-align: center;
+    }
+    h1{
+       font-family: 'Lucida Console', Monaco;
+       font-weight: normal;
+       color: #2657a5;
+       font-size: 1.8em;
+    }
+    h2{
+      font-family: 'Lucida Console', Monaco;
+      font-weight: normal;
+      color: #2657a5;
+      font-size: 1.2em;
+    }
+    h3{
+      font-family: 'Lucida Console', Monaco;
+      font-weight: normal;
+      color: #2657a5;
+      font-size: 1em;
+    }
+    table{
+      table-layout: fixed;
+      width: 230px;
+      height: 230px;
+      border-style: hidden;
+      border-collapse: collapse;
+      text-align: center;
+      empty-cells: show;
+      margin: 25px auto;
+    }
+    td {
+      background: #fff;
+      border: 3px solid #2657a5;
+    }
+    button{
+      background-color: #fff;
+      width: 130px;
+      height: 40px;
+      margin: 10px;
+      cursor: pointer;
+      color: #2657a5;
+      font-size: 1em;
+    }
+    .gameId {
+      font-family: 'Lucida Console', Monaco;
+      float:right;
+      color: #2657a5;
+    }
+    </style>
+
+  <body>
+    <div class="gameId">
+      {{gameID}}
+    </div>
+    <br>
+    <h1> Tic Tac Toe </h1>
+    <h2> {{message}}</h2>
+
+    <button onclick="location.href = 'http://localhost:5000/player2'">Start Game</button>
+    <button onclick="location.href = 'http://localhost:5000/exit'">Cancel</button>
+
+  </body>
+  
+    
+
+</html>
