@@ -87,6 +87,7 @@ def endgame():
 def getcookies():
     cookies = dict()
     cookies['gameID'] = request.cookies.get('gameID')
+    cookies['player'] = request.cookies.get('player')
     return cookies
 
 # Return filenames for a given game based on the assigned cookie value
@@ -257,6 +258,7 @@ def creategame():
                 break
     resp = make_response(redirect(initaddress))
     resp.set_cookie('gameID', gameID)
+    resp.set_cookie('player', '1')
     return resp
 
 # Initialize game based on cookies and delete excess files
@@ -284,6 +286,7 @@ def joinpost():
             message = 'Successfully joined game ' + gameID + '.'
             resp = make_response(render_template('gamejoined.html', message=message))
             resp.set_cookie('gameID', gameID)
+            resp.set_cookie('player', '2')
             return resp
     return render_template('joingame.html')
 
@@ -298,6 +301,8 @@ def exit():
 # Player 1 board
 @app.route("/player1")
 def p1():
+    if getcookies()['player'] == '2':
+        return redirect(p2address)
     if checkFiles() == False:
         return redirect(homeaddress)
     try:
@@ -325,6 +330,8 @@ def p1():
 # Player 2 board
 @app.route("/player2")
 def p2():
+    if getcookies()['player'] == '1':
+        return redirect(p1address)
     if checkFiles() == False:
         return redirect(homeaddress)
     try:
@@ -349,7 +356,15 @@ def p2():
     gameIDmessage = 'Game ID: ' + getcookies()['gameID']
     return render_template('p2board.html', board=board, message=message, gameID=gameIDmessage)
 
+@app.route("/p1restart")
+def p1restart():
+    initgame()
+    return redirect(p1address)
 
+@app.route("/p2restart")
+def p2restart():
+    initgame()
+    return redirect(p2address)
 
 #####################################
 # Individual move routes
@@ -448,4 +463,4 @@ def p29():
 
 # Run app at machine's IP and port 5000
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
