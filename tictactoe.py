@@ -2,12 +2,14 @@ import pickle, random, os
 from flask import Flask, render_template, redirect, session, request, make_response
 from flask_session import Session
 
+IP = 'localhost'
+
 # Configure routes
-homeaddress = 'http://localhost:5000/'
-initaddress = 'http://localhost:5000/init'
-p1address = 'http://localhost:5000/player1'
-p2address = 'http://localhost:5000/player2'
-exitaddress = 'http://localhost:5000/exit'
+homeaddress = 'http://' + IP + ':5000/'
+initaddress = 'http://' + IP + ':5000/init'
+p1address = 'http://' + IP + ':5000/player1'
+p2address = 'http://' + IP + ':5000/player2'
+exitaddress = 'http://' + IP + ':5000/exit'
 
 CWD = os.getcwd()
 
@@ -237,6 +239,15 @@ def deleteExcessFiles():
             pass
     return
 
+def randomize():
+    try:
+        boardFile, usedFile, turnFile = getFileNames()
+        with open(turnFile, 'w') as f:
+            f.write(str(random.randint(1,2)))
+    except:
+        pass
+    return
+
 
 #####################################
 # Primary routes
@@ -323,6 +334,8 @@ def p1():
     elif winner == 2:
         message = 'You lost! Don\'t worry though, I still believe in you.'
         endgame()
+    elif len(used) == 9 and winner == 0:
+        message = 'Wow. It\'s a tie...shocker.'
 
     gameIDmessage = 'Game ID: ' + getcookies()['gameID']
     return render_template('p1board.html', board=board, message=message, gameID=gameIDmessage)
@@ -352,6 +365,8 @@ def p2():
     elif winner == 2:
         message = 'You won! Nice job, but don\'t you have work you should be doing?'
         endgame()
+    elif len(used) == 9 and winner == 0:
+        message = 'Wow. It\'s a tie...shocker.'
 
     gameIDmessage = 'Game ID: ' + getcookies()['gameID']
     return render_template('p2board.html', board=board, message=message, gameID=gameIDmessage)
@@ -359,11 +374,13 @@ def p2():
 @app.route("/p1restart")
 def p1restart():
     initgame()
+    randomize()
     return redirect(p1address)
 
 @app.route("/p2restart")
 def p2restart():
     initgame()
+    randomize()
     return redirect(p2address)
 
 #####################################
@@ -463,4 +480,4 @@ def p29():
 
 # Run app at machine's IP and port 5000
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)

@@ -63,7 +63,7 @@
     <h2> {{message}} </h2>
 
     <div>
-      <button style=width:200px;height:40px;font-size:1em; onclick="window.location.reload()">Check for new moves</button>
+      <button id="updateButton" style=width:200px;height:40px;font-size:1em; onclick="window.location.reload()">Check for new moves</button>
       
       <table>
         <TR>
@@ -87,6 +87,10 @@
       <button style=width:100px;height:40px;font-size:1em; onclick="location.href = 'http://localhost:5000/p2restart'">Rematch</button>
 
     </div>
+
+    <script>
+      window.setTimeout(function() { document.querySelector('#updateButton').click() }, 4000)
+    </script>
 
   </body>
   
